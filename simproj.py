@@ -14,14 +14,22 @@ from matplotlib import animation
 #Neptune 30.06 AU
 #Pluto   39.44 AU
 
+
+#Constants -----------------------------------------------------#
+AU = 1            #1.496*10**11 #Astronomical unit
+GM = 4*AU**3*(np.pi)**2  #6.67**(-11) #Gravitational Constant
+mearth = 5.972*10**24
+
+
 class Planet():
     
-    def __init__(self,plot, x, y, vx, vy):
-        self.plot = plot
+    def __init__(self, x, y):
         self.x = x
         self.y = y
-        self.vx = vx
-        self.vy = vy
+        #Always starts at x,y = (*, 0)
+        self.vx = 0
+        self.vy = (GM/(x**2+y**2)**0.5)**0.5
+        
 
     #Returns distance between this planet and given planet
     def distance(self,planet):
@@ -30,11 +38,12 @@ class Planet():
 
         return (dx**2 + dy**2)**0.5
 
+    def setData(self,x,y):
+        self.x = x
+        self.y = y
 
-#Constants -----------------------------------------------------#
-AU = 1            #1.496*10**11 #Astronomical unit
-GM = 4*AU**3*(np.pi)**2  #6.67**(-11) #Gravitational Constant
-mearth = 5.972*10**24
+
+
 
 #Parameters to Study -------------------------------------------#
 Energy = []
@@ -48,32 +57,23 @@ ax = plt.axes(xlim=(-2, 2), ylim=(-2, 2))
 #initailitze celestial bodies
 sun, = ax.plot([0], [0], "yo", ms=20)
 
-
 planet1, = ax.plot([], [], "go", ms = 10)
-x1 = 1
-vx1 = 0
-y1 = 0
-vy1 = (GM/(x1**2+y1**2))**0.5
+earth = Planet(1,0)
 
 planet2, = ax.plot([], [], "bo", ms = 10)
-x2 = 1.523
-vx2 = 0
-y2 = 0
-vy2 = (GM/(x2**2+y2**2))**0.5
+mars = Planet(1.523, 0)
 
-earth = Planet(planet1, x1,y1,vx1,vy1)
-mars = Planet(planet2, x2,y2,vx2,vy2)
-
-dt = 0.001
+dt = 0.01
 
 def integrate():
-    global t, x1,y1, vx1, vy1, x2,y2, vx2, vy2
-    
-    xacc1 = -(GM*x1)/((x1**2 + y1**2)**(1.5))
-    yacc1 = -(GM*y1)/((x1**2 + y1**2)**(1.5))
+    global t, earth, mars
 
-    xacc2 = -(GM*x2)/((x2**2 + y2**2)**(1.5))
-    yacc2 = -(GM*y2)/((x2**2 + y2**2)**(1.5))
+    x_acc_earth = -(GM*earth.x)/((earth.x**2 + earth.y**2)**(1.5))
+    y_acc_earth = -(GM*earth.y)/((earth.x**2 + earth.y**2)**(1.5))
+
+    x_acc_mars = -(GM*mars.x)/((mars.x**2 + mars.y**2)**(1.5))
+    y_acc_mars = -(GM*mars.y)/((mars.x**2 + mars.y**2)**(1.5))
+    
 
 ##    ##VERLET
 ##    xnew = x + vx*dt + 0.5*xacc*(dt**2)
@@ -90,17 +90,17 @@ def integrate():
 ##    y = ynew
     
     ##EULER CROMER
-    vx1 += xacc1*dt
-    vy1 += yacc1*dt
+    earth.vx += x_acc_earth*dt
+    earth.vy += y_acc_earth*dt
 
-    x1 += vx1*dt
-    y1 += vy1*dt
+    earth.x += earth.vx*dt
+    earth.y += earth.vy*dt
 
-    vx2 += xacc2*dt
-    vy2 += yacc2*dt
+    mars.vx += x_acc_mars*dt
+    mars.vy += y_acc_mars*dt
 
-    x2 += vx2*dt
-    y2 += vy2*dt
+    mars.x += mars.vx*dt
+    mars.y += mars.vy*dt
 
     
     #Energy.append(0.5*mearth*(vx**2 + vy**2) - (GM*mearth)/((x**2 + y**2)**0.5))
@@ -114,23 +114,22 @@ def init():
     return planet1,planet2,
 
 def animate(i):
-    global planet1, planet2, x1, y1, x2, y2, t
+    global earth, mars
 
     integrate()
 
     t.append(i*dt)
 
-    
-    
-    planet1.set_data([x1], [y1])
-    planet2.set_data([x2], [y2]) 
+    planet1.set_data([earth.x], [earth.y])
+    planet2.set_data([mars.x], [mars.y]) 
     return planet1, planet2,
 
 ani = animation.FuncAnimation(fig, animate,
-                            frames = 60, interval=1, init_func = init )
+                           frames = 60, interval=1, init_func = init )
+
+
 plt.show()
 
-print(earth.distance(mars))
 
 #plt.plot(t, Energy)
 #plt.show()
