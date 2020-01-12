@@ -16,7 +16,7 @@ from matplotlib import animation
 
 
 #Constants -----------------------------------------------------#
-AU = 1            #1.496*10**11 #Astronomical unit
+AU = 1           #1.496*10**11 #Astronomical unit
 GM = 4*AU**3*(np.pi)**2  #6.67**(-11) #Gravitational Constant
 M = 1.99*10**30
 mearth = 5.972*10**24
@@ -40,9 +40,18 @@ class Planet():
 
         return (dx**2 + dy**2)**0.5
 
-    def setData(self,x,y):
-        self.x = x
-        self.y = y
+    def force(self,planets = []]):
+        x_acc = -(GM*self.x)/((self.x**2 + self.y**2)**(1.5)) 
+        y_acc = -(GM*self.y)/((self.x**2 + self.y**2)**(1.5))
+
+        for planet in planets:
+            x_acc -= GM*(planet.mass/M)*(1/(self.distance(planet))**1.5)
+            *(self.x - planet.x)
+
+            y_acc -= GM*(planet.mass/M)*(1/(self.distance(planet))**1.5)
+            *(self.y - planet.y)
+        
+        return x_acc, y_acc
 
     def mek_energy():
         return 0
@@ -57,28 +66,34 @@ t = []
 
 #Plot setup ----------------------------------------------------#
 fig = plt.figure()
-ax = plt.axes(xlim=(-13, 13), ylim=(-13, 13))
+ax = plt.axes(xlim=(-20, 20), ylim=(-20, 20))
 
 #initailitze celestial bodies
 sun, = ax.plot([0], [0], "y.", ms=10)
 
 planet1, = ax.plot([], [], "r.", ms = 5)
-mercury = Planet(3.285*10**23,0.387,0)
+mercury = Planet(3.285*10**23,AU*0.387,0)
 
 planet2, = ax.plot([], [], "b.", ms = 5)
-venus = Planet(4.867*10**24,0.723,0)
+venus = Planet(4.867*10**24,AU*0.723,0)
 
 planet3, = ax.plot([], [], "g.", ms = 5)
-earth = Planet(5.972*10**24,1,0)
+earth = Planet(5.972*10**24,AU*1,0)
 
 planet4, = ax.plot([], [], "b.", ms = 3)
-mars = Planet(6.39*10**23,1.523, 0)
+mars = Planet(6.39*10**23,AU*1.523, 0)
 
 planet5, = ax.plot([], [], "r.", ms = 8)
-jupiter = Planet(1.898*10**27,5.202, 0)
+jupiter = Planet(1.898*10**27,AU*5.202, 0)
 
 planet6, = ax.plot([], [], "g.", ms = 7)
-saturn = Planet(5.683**26,9.539, 0)
+saturn = Planet(5.683*10**26,AU*9.539, 0)
+
+planet7, = ax.plot([], [], "y.", ms = 5)
+uranus = Planet(8.681*10**25,AU*19.18, 0)
+
+planet8, = ax.plot([], [], "b.", ms = 5)
+neptune = Planet(1.024*10**26,AU*30.06, 0)
 
 
 comet, = ax.plot([], [], "ro", ms = 10)
@@ -90,39 +105,56 @@ vy = 0
 dt = 0.001
 
 def init():
-    global planet1, planet2, planet3, planet4, planet5, planet6
+    global planet1, planet2, planet3, planet4, planet5, planet6, planet7, planet8
     comet.set_data([],[])
     planet1.set_data([], [])
     planet2.set_data([], [])
     planet3.set_data([], [])
     planet4.set_data([], [])
-    planet5.set_data([], [])'
+    planet5.set_data([], [])
     planet6.set_data([], [])
-  
-    return planet1,planet2,planet3,planet4,planet5,planet6,
+    planet7.set_data([], [])
+    planet8.set_data([], [])
+    
+    return planet1,planet2,planet3,planet4,planet5,planet6,planet7,planet8,
 
 def integrate():
-    global t, mercury, venus, earth, mars, jupiter
+    global t, mercury, venus, earth, mars, jupiter, uranus, neptune
 
     r13 = mercury.distance(earth) # distance between mercury and earth
     r12 = mercury.distance(venus) # merc-venus
     r14 = mercury.distance(mars) #distance between mars and jupiter
     r15 = mercury.distance(jupiter)
-    r16 = mercury.distaance(saturn) #merc-saturn
-
+    r16 = mercury.distance(saturn) #merc-saturn
+    r17 = mercury.distance(uranus)
+    r18 = mercury.distance(neptune)
+    
     r23 = venus.distance(earth)
     r24 = venus.distance(mars)
     r25 = venus.distance(jupiter)
     r26 = venus.distance(saturn)
+    r27 = venus.distance(uranus)
+    r28 = venus.distance(neptune)
     
     r34 = earth.distance(mars) #distance between earth and mars
     r35 = earth.distance(jupiter) #distance between earth and jupiter
     r36 = earth.distance(saturn)
+    r37 = earth.distance(uranus)
+    r38 = earth.distance(neptune)
     
     r45 = mars.distance(jupiter) #distance between mars and jupiter
     r46 = mars.distance(saturn)
-
+    r47 = mars.distance(uranus)
+    r48 = mars.distance(neptune)
+    
     r56 = jupiter.distance(saturn)
+    r57 = jupiter.distance(uranus)
+    r58 = jupiter.distance(neptune)
+
+    r67 = saturn.distance(uranus)
+    r68 = saturn.distance(neptune)
+
+    r78 = uranus.distance(neptune)
 
     #MERCURY FORCE
     x_acc_mercury = -(GM*mercury.x)/((mercury.x**2 + mercury.y**2)**(1.5))
@@ -130,12 +162,18 @@ def integrate():
     - GM*(earth.mass/M)*(1/r13**1.5)*( mercury.x - earth.x )
     - GM*(mars.mass/M)*(1/r14**1.5)*( mercury.x - mars.x)
     - GM*(jupiter.mass/M)*(1/r15**1.5)*( mercury.x - jupiter.x)
+    - GM*(saturn.mass/M)*(1/r16**1.5)*( mercury.x - saturn.x)
+    - GM*(uranus.mass/M)*(1/r17**1.5)*( mercury.x - uranus.x)
+    - GM*(neptune.mass/M)*(1/r18**1.5)*( mercury.x - neptune.x)
 
     y_acc_mercury = -(GM*mercury.y)/((mercury.x**2 + mercury.y**2)**(1.5))
     - GM*(venus.mass/M)*(1/r12**1.5)*( mercury.y - venus.y )
     - GM*(earth.mass/M)*(1/r13**1.5)*( mercury.y - earth.y )
     - GM*(mars.mass/M)*(1/r14**1.5)*( mercury.y - mars.y)
     - GM*(jupiter.mass/M)*(1/r15**1.5)*( mercury.y - jupiter.y)
+    - GM*(saturn.mass/M)*(1/r16**1.5)*( mercury.y - saturn.y)
+    - GM*(uranus.mass/M)*(1/r17**1.5)*( mercury.y - uranus.y)
+    - GM*(neptune.mass/M)*(1/r18**1.5)*( mercury.y - neptune.y)
 
 
     #VENUS FORCE
@@ -144,12 +182,18 @@ def integrate():
     - GM*(earth.mass/M)*(1/r23**1.5)*( venus.x - earth.x )
     - GM*(mars.mass/M)*(1/r24**1.5)*( venus.x - mars.x)
     - GM*(jupiter.mass/M)*(1/r25**1.5)*( venus.x - jupiter.x)
+    - GM*(saturn.mass/M)*(1/r26**1.5)*( venus.x - saturn.x)
+    - GM*(uranus.mass/M)*(1/r27**1.5)*( venus.x - uranus.x)
+    - GM*(neptune.mass/M)*(1/r28**1.5)*( venus.x - neptune.x)
 
     y_acc_venus = -(GM*venus.y)/((venus.x**2 + venus.y**2)**(1.5))
     - GM*(mercury.mass/M)*(1/r12**1.5)*( venus.y - mercury.y )
     - GM*(earth.mass/M)*(1/r23**1.5)*( venus.y - earth.y )
     - GM*(mars.mass/M)*(1/r24**1.5)*( venus.y - mars.y)
     - GM*(jupiter.mass/M)*(1/r25**1.5)*( venus.y - jupiter.y)
+    - GM*(saturn.mass/M)*(1/r26**1.5)*( venus.y - saturn.y)
+    - GM*(uranus.mass/M)*(1/r27**1.5)*( venus.y - uranus.y)
+    - GM*(neptune.mass/M)*(1/r28**1.5)*( venus.y - neptune.y)
     
     #EARTH FORCE
     x_acc_earth = -(GM*earth.x)/((earth.x**2 + earth.y**2)**(1.5))
@@ -157,12 +201,18 @@ def integrate():
     - GM*(venus.mass/M)*(1/r23**1.5)*( earth.x - venus.x )
     - GM*(mars.mass/M)*(1/r34**1.5)*( earth.x - mars.x )
     - GM*(jupiter.mass/M)*(1/r35**1.5)*( earth.x - jupiter.x)
+    - GM*(saturn.mass/M)*(1/r36**1.5)*( earth.x - saturn.x)
+    - GM*(uranus.mass/M)*(1/r37**1.5)*( earth.x - uranus.x)
+    - GM*(neptune.mass/M)*(1/r38**1.5)*( earth.x - earth.x)
 
     y_acc_earth = -(GM*earth.y)/((earth.x**2 + earth.y**2)**(1.5))
     - GM*(mercury.mass/M)*(1/r13**1.5)*( earth.y - mercury.y )
     - GM*(venus.mass/M)*(1/r23**1.5)*( earth.y - venus.y )
     - GM*(mars.mass/M)*(1/r34**1.5)*( earth.y - mars.y )
     - GM*(jupiter.mass/M)*(1/r35**1.5)*( earth.y - jupiter.y)
+    - GM*(saturn.mass/M)*(1/r36**1.5)*( earth.y - saturn.y)
+    - GM*(uranus.mass/M)*(1/r37**1.5)*( earth.y - uranus.y)
+    - GM*(neptune.mass/M)*(1/r38**1.5)*( earth.y - neptune.y)
 
     #MARS FORCE
     x_acc_mars = -(GM*mars.x)/((mars.x**2 + mars.y**2)**(1.5))
@@ -170,28 +220,96 @@ def integrate():
     - GM*(mercury.mass/M)*(1/r14**1.5)*( mars.x - mercury.x )
     - GM*(earth.mass/M)*(1/r34**1.5)*(mars.x - earth.x)
     - GM*(jupiter.mass/M)*(1/r45**1.5)*( mars.x - jupiter.x)
+    - GM*(saturn.mass/M)*(1/r46**1.5)*( mars.x - saturn.x)
+    - GM*(uranus.mass/M)*(1/r47**1.5)*( mars.x - uranus.x)
+    - GM*(neptune.mass/M)*(1/r48**1.5)*( mars.x - neptune.x)
+    
 
     y_acc_mars = -(GM*mars.y)/((mars.x**2 + mars.y**2)**(1.5))
     - GM*(mercury.mass/M)*(1/r14**1.5)*( mars.y - mercury.y )
     - GM*(venus.mass/M)*(1/r24**1.5)*( mars.y - venus.y )
     - GM*(earth.mass/M)*(1/r34**1.5)*(mars.y - earth.y)
     - GM*(jupiter.mass/M)*(1/r45**1.5)*( mars.y - jupiter.y)
+    - GM*(saturn.mass/M)*(1/r46**1.5)*( mars.y - saturn.y)
+    - GM*(uranus.mass/M)*(1/r47**1.5)*( mars.y - uranus.y)
+    - GM*(neptune.mass/M)*(1/r48**1.5)*( mars.y - neptune.y)
 
     #JUPITER FORCE
     x_acc_jupiter = -(GM*jupiter.x)/((jupiter.x**2 + jupiter.y**2)**(1.5))
     - GM*(mercury.mass/M)*(1/r15**1.5)*( jupiter.x - mercury.x )
     - GM*(venus.mass/M)*(1/r25**1.5)*( jupiter.x - venus.x )
     - GM*(earth.mass/M)*(1/r35**1.5)*(jupiter.x - earth.x)
-    - GM*(mars.mass/M)*(1/r45**1.5)*( jupiter.x - jupiter.x)
+    - GM*(mars.mass/M)*(1/r45**1.5)*( jupiter.x - mars.x)
+    - GM*(saturn.mass/M)*(1/r56**1.5)*( jupiter.x - saturn.x)
+    - GM*(uranus.mass/M)*(1/r57**1.5)*( jupiter.x - uranus.x)
+    - GM*(neptune.mass/M)*(1/r58**1.5)*( jupiter.x - neptune.x)
 
     y_acc_jupiter = -(GM*jupiter.y)/((jupiter.x**2 + jupiter.y**2)**(1.5))
     - GM*(mercury.mass/M)*(1/r15**1.5)*( jupiter.y - mercury.y )
     - GM*(venus.mass/M)*(1/r25**1.5)*( jupiter.y - venus.y )
     - GM*(earth.mass/M)*(1/r35**1.5)*(jupiter.y - earth.y)
     - GM*(mars.mass/M)*(1/r45**1.5)*( jupiter.y - mars.y)
+    - GM*(saturn.mass/M)*(1/r56**1.5)*( jupiter.y - saturn.y)
+    - GM*(uranus.mass/M)*(1/r57**1.5)*( jupiter.y - uranus.y)
+    - GM*(neptune.mass/M)*(1/r58**1.5)*( jupiter.y - neptune.y)
+    
+    #SATURN FORCE
+    x_acc_saturn = -(GM*saturn.x)/((saturn.x**2 + saturn.y**2)**(1.5))
+    - GM*(mercury.mass/M)*(1/r16**1.5)*( saturn.x - mercury.x )
+    - GM*(venus.mass/M)*(1/r26**1.5)*( saturn.x - venus.x )
+    - GM*(earth.mass/M)*(1/r36**1.5)*(saturn.x - earth.x)
+    - GM*(mars.mass/M)*(1/r46**1.5)*( saturn.x - mars.x)
+    - GM*(jupiter.mass/M)*(1/r56**1.5)*( saturn.x - jupiter.x)
+    - GM*(uranus.mass/M)*(1/r67**1.5)*( saturn.x - uranus.x)
+    - GM*(neptune.mass/M)*(1/r68**1.5)*( saturn.x - neptune.x)
     
 
-    #SATURN FORCE
+    y_acc_saturn = -(GM*saturn.y)/((saturn.x**2 + saturn.y**2)**(1.5))
+    - GM*(mercury.mass/M)*(1/r16**1.5)*( saturn.y - mercury.y )
+    - GM*(venus.mass/M)*(1/r26**1.5)*( saturn.y - venus.y )
+    - GM*(earth.mass/M)*(1/r36**1.5)*(saturn.y - earth.y)
+    - GM*(mars.mass/M)*(1/r46**1.5)*( saturn.y - mars.y)
+    - GM*(jupiter.mass/M)*(1/r56**1.5)*( saturn.y - jupiter.y)
+    - GM*(uranus.mass/M)*(1/r67**1.5)*( saturn.y - uranus.y)
+    - GM*(neptune.mass/M)*(1/r68**1.5)*( saturn.y - neptune.y)
+
+    #URANUS FORCE
+    x_acc_uranus = -(GM*uranus.x)/((uranus.x**2 + uranus.y**2)**(1.5))
+    - GM*(mercury.mass/M)*(1/r17**1.5)*( uranus.x - mercury.x )
+    - GM*(venus.mass/M)*(1/r27**1.5)*( uranus.x - venus.x )
+    - GM*(earth.mass/M)*(1/r37**1.5)*(uranus.x - earth.x)
+    - GM*(mars.mass/M)*(1/r47**1.5)*( uranus.x - jupiter.x)
+    - GM*(jupiter.mass/M)*(1/r57**1.5)*( uranus.x - jupiter.x)
+    - GM*(saturn.mass/M)*(1/r67**1.5)*( uranus.x - saturn.x)
+    - GM*(neptune.mass/M)*(1/r78**1.5)*( uranus.x - neptune.x)
+
+    y_acc_uranus = -(GM*uranus.y)/((uranus.x**2 + uranus.y**2)**(1.5))
+    - GM*(mercury.mass/M)*(1/r17**1.5)*( uranus.y - mercury.y )
+    - GM*(venus.mass/M)*(1/r27**1.5)*( uranus.y - venus.y )
+    - GM*(earth.mass/M)*(1/r37**1.5)*(uranus.y - earth.y)
+    - GM*(mars.mass/M)*(1/r47**1.5)*( uranus.y - mars.y)
+    - GM*(jupiter.mass/M)*(1/r57**1.5)*( uranus.y - jupiter.y)
+    - GM*(saturn.mass/M)*(1/r67**1.5)*( uranus.y - saturn.y)
+    - GM*(neptune.mass/M)*(1/r78**1.5)*( uranus.x - neptune.x)
+
+    #NEPTUNE FORCE
+    x_acc_neptune = -(GM*neptune.x)/((neptune.x**2 + neptune.y**2)**(1.5))
+    - GM*(mercury.mass/M)*(1/r18**1.5)*( neptune.x - mercury.x )
+    - GM*(venus.mass/M)*(1/r28**1.5)*( neptune.x - venus.x )
+    - GM*(earth.mass/M)*(1/r38**1.5)*(neptune.x - earth.x)
+    - GM*(mars.mass/M)*(1/r48**1.5)*( neptune.x - jupiter.x)
+    - GM*(jupiter.mass/M)*(1/r58**1.5)*( neptune.x - jupiter.x)
+    - GM*(saturn.mass/M)*(1/r68**1.5)*( neptune.x - saturn.x)
+    - GM*(uranus.mass/M)*(1/r78**1.5)*( neptune.x - uranus.x)
+
+    y_acc_neptune = -(GM*neptune.y)/((neptune.x**2 + neptune.y**2)**(1.5))
+    - GM*(mercury.mass/M)*(1/r18**1.5)*( neptune.y - mercury.y )
+    - GM*(venus.mass/M)*(1/r28**1.5)*( neptune.y - venus.y )
+    - GM*(earth.mass/M)*(1/r38**1.5)*(neptune.y - earth.y)
+    - GM*(mars.mass/M)*(1/r48**1.5)*( neptune.y - mars.y)
+    - GM*(jupiter.mass/M)*(1/r58**1.5)*( neptune.y - jupiter.y)
+    - GM*(saturn.mass/M)*(1/r68**1.5)*( neptune.y - saturn.y)
+    - GM*(uranus.mass/M)*(1/r78**1.5)*( neptune.y - uranus.y)
     
 ##    ##VERLET
 ##    xnew = x + vx*dt + 0.5*xacc*(dt**2)
@@ -238,12 +356,24 @@ def integrate():
     jupiter.x += jupiter.vx*dt
     jupiter.y += jupiter.vy*dt
 
+    saturn.vx += x_acc_saturn*dt
+    saturn.vy += y_acc_saturn*dt
+
+    saturn.x += saturn.vx*dt
+    saturn.y += saturn.vy*dt
+
+    uranus.vx += x_acc_uranus*dt
+    uranus.vy += y_acc_uranus*dt
+
+    uranus.x += uranus.vx*dt
+    uranus.y += uranus.vy*dt
+
     
     #Energy.append(0.5*mearth*(vx**2 + vy**2) - (GM*mearth)/((x**2 + y**2)**0.5))
     
 
 def animate(i):
-    global mercury, venus, earth, mars, jupiter
+    global mercury, venus, earth, mars, jupiter, saturn, uranus
 
     integrate()
 
@@ -256,8 +386,10 @@ def animate(i):
     planet3.set_data([earth.x], [earth.y])
     planet4.set_data([mars.x], [mars.y])
     planet5.set_data([jupiter.x], [jupiter.y])
+    planet6.set_data([saturn.x], [saturn.y])
+    planet7.set_data([uranus.x], [uranus.y])
     
-    return planet1, planet2, planet3, planet4, planet5,
+    return planet1, planet2, planet3, planet4, planet5, planet6, planet7,
 
 ani = animation.FuncAnimation(fig, animate,
                            frames = 60, interval=1, init_func = init )
