@@ -66,7 +66,7 @@ t = []
 
 #Plot setup ----------------------------------------------------#
 fig = plt.figure()
-ax = plt.axes(xlim=(-35, 35), ylim=(-35, 35))
+ax = plt.axes(xlim=(-2, 2), ylim=(-2, 2))
 
 #initailitze celestial bodies
 sun, = ax.plot([0], [0], "y.", ms=10)
@@ -157,159 +157,44 @@ def integrate():
     r78 = uranus.distance(neptune)
 
     #MERCURY FORCE
-    x_acc_mercury = -(GM*mercury.x)/((mercury.x**2 + mercury.y**2)**(1.5))
-    - GM*(venus.mass/M)*(1/r12**1.5)*( mercury.x - venus.x )
-    - GM*(earth.mass/M)*(1/r13**1.5)*( mercury.x - earth.x )
-    - GM*(mars.mass/M)*(1/r14**1.5)*( mercury.x - mars.x)
-    - GM*(jupiter.mass/M)*(1/r15**1.5)*( mercury.x - jupiter.x)
-    - GM*(saturn.mass/M)*(1/r16**1.5)*( mercury.x - saturn.x)
-    - GM*(uranus.mass/M)*(1/r17**1.5)*( mercury.x - uranus.x)
-    - GM*(neptune.mass/M)*(1/r18**1.5)*( mercury.x - neptune.x)
-
-    y_acc_mercury = -(GM*mercury.y)/((mercury.x**2 + mercury.y**2)**(1.5))
-    - GM*(venus.mass/M)*(1/r12**1.5)*( mercury.y - venus.y )
-    - GM*(earth.mass/M)*(1/r13**1.5)*( mercury.y - earth.y )
-    - GM*(mars.mass/M)*(1/r14**1.5)*( mercury.y - mars.y)
-    - GM*(jupiter.mass/M)*(1/r15**1.5)*( mercury.y - jupiter.y)
-    - GM*(saturn.mass/M)*(1/r16**1.5)*( mercury.y - saturn.y)
-    - GM*(uranus.mass/M)*(1/r17**1.5)*( mercury.y - uranus.y)
-    - GM*(neptune.mass/M)*(1/r18**1.5)*( mercury.y - neptune.y)
-
+    x_acc_mercury, y_acc_mercury = mercury.force([venus, earth,
+                                                 mars, jupiter, saturn,
+                                                 uranus, neptune])
 
     #VENUS FORCE
-    x_acc_venus = -(GM*venus.x)/((venus.x**2 + venus.y**2)**(1.5))
-    - GM*(mercury.mass/M)*(1/r12**1.5)*( venus.x - mercury.x )
-    - GM*(earth.mass/M)*(1/r23**1.5)*( venus.x - earth.x )
-    - GM*(mars.mass/M)*(1/r24**1.5)*( venus.x - mars.x)
-    - GM*(jupiter.mass/M)*(1/r25**1.5)*( venus.x - jupiter.x)
-    - GM*(saturn.mass/M)*(1/r26**1.5)*( venus.x - saturn.x)
-    - GM*(uranus.mass/M)*(1/r27**1.5)*( venus.x - uranus.x)
-    - GM*(neptune.mass/M)*(1/r28**1.5)*( venus.x - neptune.x)
+    x_acc_venus ,y_acc_venus = venus.force([mercury, earth,
+                                            mars, jupiter,saturn,
+                                            uranus, neptune])
 
-    y_acc_venus = -(GM*venus.y)/((venus.x**2 + venus.y**2)**(1.5))
-    - GM*(mercury.mass/M)*(1/r12**1.5)*( venus.y - mercury.y )
-    - GM*(earth.mass/M)*(1/r23**1.5)*( venus.y - earth.y )
-    - GM*(mars.mass/M)*(1/r24**1.5)*( venus.y - mars.y)
-    - GM*(jupiter.mass/M)*(1/r25**1.5)*( venus.y - jupiter.y)
-    - GM*(saturn.mass/M)*(1/r26**1.5)*( venus.y - saturn.y)
-    - GM*(uranus.mass/M)*(1/r27**1.5)*( venus.y - uranus.y)
-    - GM*(neptune.mass/M)*(1/r28**1.5)*( venus.y - neptune.y)
-    
     #EARTH FORCE
-    x_acc_earth = -(GM*earth.x)/((earth.x**2 + earth.y**2)**(1.5))
-    - GM*(mercury.mass/M)*(1/r13**1.5)*( earth.x - mercury.x )
-    - GM*(venus.mass/M)*(1/r23**1.5)*( earth.x - venus.x )
-    - GM*(mars.mass/M)*(1/r34**1.5)*( earth.x - mars.x )
-    - GM*(jupiter.mass/M)*(1/r35**1.5)*( earth.x - jupiter.x)
-    - GM*(saturn.mass/M)*(1/r36**1.5)*( earth.x - saturn.x)
-    - GM*(uranus.mass/M)*(1/r37**1.5)*( earth.x - uranus.x)
-    - GM*(neptune.mass/M)*(1/r38**1.5)*( earth.x - earth.x)
-
-    y_acc_earth = -(GM*earth.y)/((earth.x**2 + earth.y**2)**(1.5))
-    - GM*(mercury.mass/M)*(1/r13**1.5)*( earth.y - mercury.y )
-    - GM*(venus.mass/M)*(1/r23**1.5)*( earth.y - venus.y )
-    - GM*(mars.mass/M)*(1/r34**1.5)*( earth.y - mars.y )
-    - GM*(jupiter.mass/M)*(1/r35**1.5)*( earth.y - jupiter.y)
-    - GM*(saturn.mass/M)*(1/r36**1.5)*( earth.y - saturn.y)
-    - GM*(uranus.mass/M)*(1/r37**1.5)*( earth.y - uranus.y)
-    - GM*(neptune.mass/M)*(1/r38**1.5)*( earth.y - neptune.y)
+    x_acc_earth, y_acc_earth = earth.force([mercury, venus,
+                                            mars, jupiter, saturn,
+                                            uranus, neptune])
 
     #MARS FORCE
-    x_acc_mars = -(GM*mars.x)/((mars.x**2 + mars.y**2)**(1.5))
-    - GM*(venus.mass/M)*(1/r24**1.5)*( mars.x - venus.x )
-    - GM*(mercury.mass/M)*(1/r14**1.5)*( mars.x - mercury.x )
-    - GM*(earth.mass/M)*(1/r34**1.5)*(mars.x - earth.x)
-    - GM*(jupiter.mass/M)*(1/r45**1.5)*( mars.x - jupiter.x)
-    - GM*(saturn.mass/M)*(1/r46**1.5)*( mars.x - saturn.x)
-    - GM*(uranus.mass/M)*(1/r47**1.5)*( mars.x - uranus.x)
-    - GM*(neptune.mass/M)*(1/r48**1.5)*( mars.x - neptune.x)
-    
-
-    y_acc_mars = -(GM*mars.y)/((mars.x**2 + mars.y**2)**(1.5))
-    - GM*(mercury.mass/M)*(1/r14**1.5)*( mars.y - mercury.y )
-    - GM*(venus.mass/M)*(1/r24**1.5)*( mars.y - venus.y )
-    - GM*(earth.mass/M)*(1/r34**1.5)*(mars.y - earth.y)
-    - GM*(jupiter.mass/M)*(1/r45**1.5)*( mars.y - jupiter.y)
-    - GM*(saturn.mass/M)*(1/r46**1.5)*( mars.y - saturn.y)
-    - GM*(uranus.mass/M)*(1/r47**1.5)*( mars.y - uranus.y)
-    - GM*(neptune.mass/M)*(1/r48**1.5)*( mars.y - neptune.y)
+    x_acc_mars, y_acc_mars = mars.force([mercury, venus, earth,
+                                            jupiter, saturn,
+                                            uranus, neptune])
 
     #JUPITER FORCE
-    x_acc_jupiter = -(GM*jupiter.x)/((jupiter.x**2 + jupiter.y**2)**(1.5))
-    - GM*(mercury.mass/M)*(1/r15**1.5)*( jupiter.x - mercury.x )
-    - GM*(venus.mass/M)*(1/r25**1.5)*( jupiter.x - venus.x )
-    - GM*(earth.mass/M)*(1/r35**1.5)*(jupiter.x - earth.x)
-    - GM*(mars.mass/M)*(1/r45**1.5)*( jupiter.x - mars.x)
-    - GM*(saturn.mass/M)*(1/r56**1.5)*( jupiter.x - saturn.x)
-    - GM*(uranus.mass/M)*(1/r57**1.5)*( jupiter.x - uranus.x)
-    - GM*(neptune.mass/M)*(1/r58**1.5)*( jupiter.x - neptune.x)
+    x_acc_jupiter, y_acc_jupiter = jupiter.force([mercury, venus, earth,
+                                            mars, saturn,
+                                            uranus, neptune])
 
-    y_acc_jupiter = -(GM*jupiter.y)/((jupiter.x**2 + jupiter.y**2)**(1.5))
-    - GM*(mercury.mass/M)*(1/r15**1.5)*( jupiter.y - mercury.y )
-    - GM*(venus.mass/M)*(1/r25**1.5)*( jupiter.y - venus.y )
-    - GM*(earth.mass/M)*(1/r35**1.5)*(jupiter.y - earth.y)
-    - GM*(mars.mass/M)*(1/r45**1.5)*( jupiter.y - mars.y)
-    - GM*(saturn.mass/M)*(1/r56**1.5)*( jupiter.y - saturn.y)
-    - GM*(uranus.mass/M)*(1/r57**1.5)*( jupiter.y - uranus.y)
-    - GM*(neptune.mass/M)*(1/r58**1.5)*( jupiter.y - neptune.y)
-    
     #SATURN FORCE
-    x_acc_saturn = -(GM*saturn.x)/((saturn.x**2 + saturn.y**2)**(1.5))
-    - GM*(mercury.mass/M)*(1/r16**1.5)*( saturn.x - mercury.x )
-    - GM*(venus.mass/M)*(1/r26**1.5)*( saturn.x - venus.x )
-    - GM*(earth.mass/M)*(1/r36**1.5)*(saturn.x - earth.x)
-    - GM*(mars.mass/M)*(1/r46**1.5)*( saturn.x - mars.x)
-    - GM*(jupiter.mass/M)*(1/r56**1.5)*( saturn.x - jupiter.x)
-    - GM*(uranus.mass/M)*(1/r67**1.5)*( saturn.x - uranus.x)
-    - GM*(neptune.mass/M)*(1/r68**1.5)*( saturn.x - neptune.x)
-    
-
-    y_acc_saturn = -(GM*saturn.y)/((saturn.x**2 + saturn.y**2)**(1.5))
-    - GM*(mercury.mass/M)*(1/r16**1.5)*( saturn.y - mercury.y )
-    - GM*(venus.mass/M)*(1/r26**1.5)*( saturn.y - venus.y )
-    - GM*(earth.mass/M)*(1/r36**1.5)*(saturn.y - earth.y)
-    - GM*(mars.mass/M)*(1/r46**1.5)*( saturn.y - mars.y)
-    - GM*(jupiter.mass/M)*(1/r56**1.5)*( saturn.y - jupiter.y)
-    - GM*(uranus.mass/M)*(1/r67**1.5)*( saturn.y - uranus.y)
-    - GM*(neptune.mass/M)*(1/r68**1.5)*( saturn.y - neptune.y)
+    x_acc_saturn, y_acc_saturn =saturn.force([mercury, venus, earth,
+                                            mars, jupiter,
+                                            uranus, neptune])
 
     #URANUS FORCE
-    x_acc_uranus = -(GM*uranus.x)/((uranus.x**2 + uranus.y**2)**(1.5))
-    - GM*(mercury.mass/M)*(1/r17**1.5)*( uranus.x - mercury.x )
-    - GM*(venus.mass/M)*(1/r27**1.5)*( uranus.x - venus.x )
-    - GM*(earth.mass/M)*(1/r37**1.5)*(uranus.x - earth.x)
-    - GM*(mars.mass/M)*(1/r47**1.5)*( uranus.x - jupiter.x)
-    - GM*(jupiter.mass/M)*(1/r57**1.5)*( uranus.x - jupiter.x)
-    - GM*(saturn.mass/M)*(1/r67**1.5)*( uranus.x - saturn.x)
-    - GM*(neptune.mass/M)*(1/r78**1.5)*( uranus.x - neptune.x)
-
-    y_acc_uranus = -(GM*uranus.y)/((uranus.x**2 + uranus.y**2)**(1.5))
-    - GM*(mercury.mass/M)*(1/r17**1.5)*( uranus.y - mercury.y )
-    - GM*(venus.mass/M)*(1/r27**1.5)*( uranus.y - venus.y )
-    - GM*(earth.mass/M)*(1/r37**1.5)*(uranus.y - earth.y)
-    - GM*(mars.mass/M)*(1/r47**1.5)*( uranus.y - mars.y)
-    - GM*(jupiter.mass/M)*(1/r57**1.5)*( uranus.y - jupiter.y)
-    - GM*(saturn.mass/M)*(1/r67**1.5)*( uranus.y - saturn.y)
-    - GM*(neptune.mass/M)*(1/r78**1.5)*( uranus.x - neptune.x)
+    x_acc_uranus, y_acc_uranus = uranus.force([mercury, venus, earth,
+                                            mars, jupiter, saturn,
+                                            neptune])
 
     #NEPTUNE FORCE
-    x_acc_neptune = -(GM*neptune.x)/((neptune.x**2 + neptune.y**2)**(1.5))
-    - GM*(mercury.mass/M)*(1/r18**1.5)*( neptune.x - mercury.x )
-    - GM*(venus.mass/M)*(1/r28**1.5)*( neptune.x - venus.x )
-    - GM*(earth.mass/M)*(1/r38**1.5)*(neptune.x - earth.x)
-    - GM*(mars.mass/M)*(1/r48**1.5)*( neptune.x - jupiter.x)
-    - GM*(jupiter.mass/M)*(1/r58**1.5)*( neptune.x - jupiter.x)
-    - GM*(saturn.mass/M)*(1/r68**1.5)*( neptune.x - saturn.x)
-    - GM*(uranus.mass/M)*(1/r78**1.5)*( neptune.x - uranus.x)
-
-    y_acc_neptune = -(GM*neptune.y)/((neptune.x**2 + neptune.y**2)**(1.5))
-    - GM*(mercury.mass/M)*(1/r18**1.5)*( neptune.y - mercury.y )
-    - GM*(venus.mass/M)*(1/r28**1.5)*( neptune.y - venus.y )
-    - GM*(earth.mass/M)*(1/r38**1.5)*(neptune.y - earth.y)
-    - GM*(mars.mass/M)*(1/r48**1.5)*( neptune.y - mars.y)
-    - GM*(jupiter.mass/M)*(1/r58**1.5)*( neptune.y - jupiter.y)
-    - GM*(saturn.mass/M)*(1/r68**1.5)*( neptune.y - saturn.y)
-    - GM*(uranus.mass/M)*(1/r78**1.5)*( neptune.y - uranus.y)
+    x_acc_neptune, y_acc_neptune = neptune.force([mercury, venus, earth,
+                                            mars, jupiter, saturn,
+                                            uranus])
     
 ##    ##VERLET
 ##    xnew = x + vx*dt + 0.5*xacc*(dt**2)
