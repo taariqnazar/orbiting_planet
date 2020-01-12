@@ -40,16 +40,16 @@ class Planet():
 
         return (dx**2 + dy**2)**0.5
 
-    def force(self,planets = []]):
+    def force(self,planets = []):
         x_acc = -(GM*self.x)/((self.x**2 + self.y**2)**(1.5)) 
         y_acc = -(GM*self.y)/((self.x**2 + self.y**2)**(1.5))
 
         for planet in planets:
-            x_acc -= GM*(planet.mass/M)*(1/(self.distance(planet))**1.5)
-            *(self.x - planet.x)
+            x_acc -= GM*(planet.mass/M)*(1/(self.distance(planet))**1.5)*(self.x - planet.x)
+            
 
-            y_acc -= GM*(planet.mass/M)*(1/(self.distance(planet))**1.5)
-            *(self.y - planet.y)
+            y_acc -= GM*(planet.mass/M)*(1/(self.distance(planet))**1.5)*(self.y - planet.y)
+            
         
         return x_acc, y_acc
 
@@ -66,7 +66,7 @@ t = []
 
 #Plot setup ----------------------------------------------------#
 fig = plt.figure()
-ax = plt.axes(xlim=(-20, 20), ylim=(-20, 20))
+ax = plt.axes(xlim=(-35, 35), ylim=(-35, 35))
 
 #initailitze celestial bodies
 sun, = ax.plot([0], [0], "y.", ms=10)
@@ -368,12 +368,18 @@ def integrate():
     uranus.x += uranus.vx*dt
     uranus.y += uranus.vy*dt
 
+    neptune.vx += x_acc_neptune*dt
+    uranus.vy += y_acc_neptune*dt
+
+    neptune.x += neptune.vx*dt
+    neptune.y += neptune.vy*dt
+
     
     #Energy.append(0.5*mearth*(vx**2 + vy**2) - (GM*mearth)/((x**2 + y**2)**0.5))
     
 
 def animate(i):
-    global mercury, venus, earth, mars, jupiter, saturn, uranus
+    global mercury, venus, earth, mars, jupiter, saturn, uranus, neptune
 
     integrate()
 
@@ -388,8 +394,9 @@ def animate(i):
     planet5.set_data([jupiter.x], [jupiter.y])
     planet6.set_data([saturn.x], [saturn.y])
     planet7.set_data([uranus.x], [uranus.y])
+    planet8.set_data([neptune.x], [neptune.y])
     
-    return planet1, planet2, planet3, planet4, planet5, planet6, planet7,
+    return planet1, planet2, planet3, planet4, planet5, planet6, planet7, planet8
 
 ani = animation.FuncAnimation(fig, animate,
                            frames = 60, interval=1, init_func = init )
